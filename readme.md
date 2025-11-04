@@ -64,3 +64,57 @@ SeniorResearch-LSTM/
 ├── README.md
 └── LICENSE
 ```
+---
+## Enviroment Setup
+> [!IMPORTANT] The model built will need CUDA support and NVIDIA drivers. You must verify your recognition this way: 
+```bash
+nvidia-smi
+```
+---
+The following things are needed for this project: 
+
+1. Python Virtual Environment
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+2. Dependencies
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+pip install librosa numpy pandas scikit-learn matplotlib tqdm
+```
+3. Cuda Verification
+```bash
+import torch
+print(torch.cuda.is_available(), torch.cuda.get_device_name(0))
+```
+---
+## Data Pipelining
+### Phase 1 - Chart extraction
+Chart extraction must be performed. It is highly encourgaed to use the MikuMelt Code linked to this repo as a CPK extractor is needed to pull in-game files. Other extractors have been found to be depreciated. Charts are located in the `.dsc` An example of how data is pulled is via the following
+
+```json
+{
+  "song": "Melt",
+  "difficulty": "Hard",
+  "notes": [
+    {"time": 0.85, "type": "TAP"},
+    {"time": 1.12, "type": "HOLD"}
+  ]
+}
+```
+
+### Phase 2 - Audio Extraction
+Extracting mel-spectrograms, onset strength, and tempo data is done in the following
+```python
+import librosa
+y, sr = librosa.load("data/audio/melt.wav", sr=22050)
+mel = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=64)
+onset = librosa.onset.onset_strength(y=y, sr=sr)
+```
+
+### Phase 3 - Dataset Assembly
+Aligning note timestaps with featured frames (≈20 fps) and labeling of each timestep is needed. Each note timestep is delegated and merged as:
+```bash
+data/processed/diva_382.npz
+```
