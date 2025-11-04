@@ -120,7 +120,7 @@ data/processed/diva_382.npz
 ```
 ---
 ## Model Architecture
->>[!NOTE] This area is subject to change
+> [!NOTE] This area is subject to change
 ``` python
 class ChartLSTM(nn.Module):
     def __init__(self, input_size=80, hidden_size=512, num_layers=3, output_size=6):
