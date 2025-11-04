@@ -118,3 +118,52 @@ Aligning note timestaps with featured frames (≈20 fps) and labeling of each ti
 ```bash
 data/processed/diva_382.npz
 ```
+---
+## Model Architecture
+>>[!NOTE] This area is subject to change
+``` python
+class ChartLSTM(nn.Module):
+    def __init__(self, input_size=80, hidden_size=512, num_layers=3, output_size=6):
+        super().__init__()
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers,
+                            dropout=0.2, batch_first=True)
+        self.fc = nn.Linear(hidden_size, output_size)
+    def forward(self, x):
+        out, _ = self.lstm(x)
+        return self.fc(out)
+```
+- Input: 80-dimensional audio feature vector per frame
+- Output: Probability distribution across note types.
+- Loss: Catagorical Cross entropy
+- Optimizer : Adam (1e3 -> 1e4 decay)
+- Training: 40-60 epocs on RTX 3080 12Gb
+
+---
+
+## Training and Evaluation
+Metrics Computed:
+- Accuracy
+- Mean timing offset
+- Note density correlation
+- Loss cuves and confusion matrix
+
+## Dataset Summary
+- Songs -> 382
+- Avg Duration -> 180s
+- Timesteps (20fps) -> 1.3 million
+- features per step -> 64-80
+- Note classes 5-8
+
+## Results and Future work
+- Early experiments achieve promising alignment between AI-generated and human-made note densities.
+- Future directions:
+-- Transformer or hybrid LSTM-CNN Architectures
+-- Dfficulty-specific models
+-- interactive chart preview tool
+--Cross-game generalization
+
+## Author
+Chris Windrow
+Senior Research Project - Eastern Connecticut State University
+Professor: Garrett Dancik
+Fall 2025
